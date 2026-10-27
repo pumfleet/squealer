@@ -1,0 +1,8 @@
+.DS_Store
+*.xcodeproj
+build/
+DerivedData/
+.build/
+.swiftpm/
+Squealer/Resources/GeoIP/*.mmdb
+xcuserdata/

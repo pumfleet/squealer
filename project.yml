@@ -1,0 +1,140 @@
+name: Squealer
+options:
+  bundleIdPrefix: com.fusial
+  developmentLanguage: en
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+configs:
+  Debug: debug
+  Release: release
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: U6P67B4375
+    MARKETING_VERSION: 0.1.0
+    SQUEALER_BUILD: 1
+    # The extension's build number decides when macOS replaces the running extension, so it can differ from
+    # the app's: dev installs only bump it when extension code changes.
+    SQUEALER_EXTENSION_BUILD: $(SQUEALER_BUILD)
+    CURRENT_PROJECT_VERSION: $(SQUEALER_BUILD)
+    ENABLE_HARDENED_RUNTIME: YES
+    CODE_SIGN_STYLE: Automatic
+    DEAD_CODE_STRIPPING: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    SWIFT_STRICT_CONCURRENCY: complete
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+  configs:
+    Debug:
+      # Development profiles grant the plain value; Developer ID requires the -systemextension variant.
+      SQUEALER_NE_FILTER: content-filter-provider
+    Release:
+      # Archives are signed for development; scripts/release.sh re-signs them for Developer ID with the
+      # -systemextension form of the entitlement, which only Developer ID profiles grant.
+      SQUEALER_NE_FILTER: content-filter-provider
+packages:
+  SquealerKit:
+    path: Packages/SquealerKit
+  GRDB:
+    url: https://github.com/groue/GRDB.swift
+    from: 7.0.0
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: 2.6.0
+targets:
+  Squealer:
+    type: application
+    platform: macOS
+    sources:
+      - path: Squealer
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fusial.squealer
+        PRODUCT_NAME: Squealer
+        INFOPLIST_FILE: Squealer/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Squealer/Squealer.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+        COMBINE_HIDPI_IMAGES: YES
+        # Set both to enable Sparkle updates; leave empty to ship without an updater.
+        SQUEALER_APPCAST_URL: ""
+        SQUEALER_SPARKLE_PUBLIC_KEY: ""
+    dependencies:
+      - package: SquealerKit
+      - package: Sparkle
+      - target: SquealerExtension
+        embed: true
+        codeSign: true
+        copy:
+          destination: wrapper
+          subpath: Contents/Library/SystemExtensions
+      - target: SquealerCLI
+        embed: true
+        codeSign: true
+        copy:
+          destination: wrapper
+          subpath: Contents/Helpers
+  SquealerTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: SquealerTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fusial.squealer.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/Squealer.app/Contents/MacOS/Squealer
+        BUNDLE_LOADER: $(TEST_HOST)
+    dependencies:
+      - target: Squealer
+      - package: SquealerKit
+  SquealerCLI:
+    type: tool
+    platform: macOS
+    sources:
+      - path: SquealerCLI
+    settings:
+      base:
+        PRODUCT_NAME: squealer
+        PRODUCT_MODULE_NAME: SquealerCLI
+        PRODUCT_BUNDLE_IDENTIFIER: com.fusial.squealer.cli
+        GENERATE_INFOPLIST_FILE: YES
+        CREATE_INFOPLIST_SECTION_IN_BINARY: YES
+        SKIP_INSTALL: YES
+        PROVISIONING_PROFILE_SPECIFIER: ""
+    dependencies:
+      - package: SquealerKit
+  SquealerExtension:
+    type: system-extension
+    platform: macOS
+    sources:
+      - path: SquealerExtension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fusial.squealer.extension
+        PRODUCT_NAME: com.fusial.squealer.extension
+        CURRENT_PROJECT_VERSION: $(SQUEALER_EXTENSION_BUILD)
+        INFOPLIST_FILE: SquealerExtension/Info.plist
+        CODE_SIGN_ENTITLEMENTS: SquealerExtension/SquealerExtension.entitlements
+        SKIP_INSTALL: YES
+    dependencies:
+      - package: SquealerKit
+      - package: GRDB
+      - sdk: NetworkExtension.framework
+schemes:
+  Squealer:
+    build:
+      targets:
+        Squealer: all
+        SquealerExtension: all
+    test:
+      config: Debug
+      targets:
+        - SquealerTests
+    run:
+      config: Debug
+    archive:
+      config: Release
