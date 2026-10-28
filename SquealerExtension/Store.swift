@@ -22,6 +22,10 @@ final class Store: Sendable {
         try migrator.migrate(database)
     }
 
+    func erase() throws {
+        try FileManager.default.removeItem(at: directory)
+    }
+
     var blocklistDirectory: URL {
         directory.appendingPathComponent("Blocklists", isDirectory: true)
     }

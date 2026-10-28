@@ -168,7 +168,7 @@ final class DemoBackend: EngineBackend, @unchecked Sendable {
                 return .backups([BackupInfo(id: "auto-1.json", created: .now - 3_600, rules: state.rules.count, isAutomatic: true)])
             case .exportConfiguration:
                 return .configuration(ConfigurationBackup(settings: state.settings, rules: Array(state.rules.values), ruleGroups: state.groups, profiles: state.profiles, blocklists: state.blocklists))
-            case .refreshBlocklist, .clearHistory, .refreshRuleGroup, .restoreBackup, .restoreConfiguration, .endLogoutSessions:
+            case .refreshBlocklist, .clearHistory, .refreshRuleGroup, .restoreBackup, .restoreConfiguration, .endLogoutSessions, .eraseAllData:
                 break
             }
             return .ok

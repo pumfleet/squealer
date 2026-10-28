@@ -58,14 +58,15 @@ Anyone can read state with the CLI. Changing anything requires `sudo`.
 
 ## Releasing
 
-`scripts/release.sh <version> [build] [--skip-notarize]` produces a signed DMG:
+`scripts/release.sh <version> [build] [--skip-notarize] [--publish]` produces a signed DMG:
 
 1. Archives the app.
 2. Re-signs it inside-out for Developer ID. Xcode can't export it directly: Developer ID profiles only grant the `-systemextension` form of the Network Extension entitlement, and export doesn't convert to it.
 3. Notarizes and staples it.
-4. Builds the DMG, plus a Sparkle appcast when Sparkle is configured.
+4. Builds the DMG and a Sparkle appcast signed with the EdDSA key in the login keychain.
+5. With `--publish`, creates the GitHub release `v<version>` with the DMG and `appcast.xml`. Installed copies check `releases/latest/download/appcast.xml`, so publishing a release ships the update. Commit and push first.
 
-Before the first release:
+On a new release machine:
 
 1. **Provisioning profiles.** The Developer ID profiles ("Mac Team Direct Provisioning Profile: com.fusial.squealer" and `….extension`) must exist locally. `xcodebuild -exportArchive -allowProvisioningUpdates` creates them.
 2. **Notarization credentials:**
@@ -74,8 +75,15 @@ Before the first release:
    xcrun notarytool store-credentials squealer --apple-id <id> --team-id U6P67B4375
    ```
 
-3. **Sparkle updates (optional).** Run Sparkle's `generate_keys`, then set `SQUEALER_APPCAST_URL` and `SQUEALER_SPARKLE_PUBLIC_KEY` in `project.yml`. If either is empty, the app ships without an updater.
-4. **Licensing.** Not decided yet. `Squealer/App/Licensing.swift` is the hook where a provider plugs in.
+3. **Sparkle key.** Import the private key with `generate_keys -f <file>`. Its public half is `SQUEALER_SPARKLE_PUBLIC_KEY` in `project.yml`. Without it, installed copies can't be updated.
+
+### Building your own copy
+
+The project is signed with Fusial's team. To run it under your own Apple Developer account, change `DEVELOPMENT_TEAM` in `project.yml` and `XPCConstants.teamID` in SquealerKit, which the app and extension use to check each other's signatures. Network Extension entitlements require a paid membership.
+
+## License
+
+Squealer is free software, licensed under the [GNU General Public License v3.0](LICENSE).
 
 ## Credits
 

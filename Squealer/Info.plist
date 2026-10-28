@@ -34,6 +34,8 @@
 	<string>$(SQUEALER_APPCAST_URL)</string>
 	<key>SUPublicEDKey</key>
 	<string>$(SQUEALER_SPARKLE_PUBLIC_KEY)</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 	<key>SUEnableInstallerLauncherService</key>
 	<false/>
 	<key>NSUserNotificationAlertStyle</key>

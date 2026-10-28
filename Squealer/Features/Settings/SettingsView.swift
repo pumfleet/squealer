@@ -354,7 +354,10 @@ private struct AdvancedSettings: View {
                     Text(cliMessage).font(.caption).foregroundStyle(.secondary)
                 }
                 LabeledContent("Diagnostics") {
-                    Button("Show in Finder") { Diagnostics.reveal() }
+                    HStack {
+                        Button("Show in Finder") { Diagnostics.reveal() }
+                        Link("Report an Issue…", destination: Links.newIssue)
+                    }
                 }
             } footer: {
                 Text("Installs `squealer` in /usr/local/bin, for scripting and checking status from Terminal. Changing settings from the command line requires sudo.")
@@ -378,13 +381,30 @@ private struct AdvancedSettings: View {
             }
         }
         .formStyle(.grouped)
-        .confirmationDialog("Uninstall Squealer's network extension?", isPresented: $confirmUninstall) {
-            Button("Uninstall", role: .destructive) {
-                Task { await extensionManager.deactivate() }
+        .confirmationDialog("Uninstall Squealer?", isPresented: $confirmUninstall) {
+            Button("Uninstall and Keep Rules", role: .destructive) {
+                Task { await uninstall(erasingData: false) }
+            }
+            Button("Uninstall and Delete All Data", role: .destructive) {
+                Task { await uninstall(erasingData: true) }
             }
         } message: {
-            Text("Filtering stops immediately. You can then move Squealer to the Trash.")
+            Text("Filtering stops immediately. Kept rules come back if you reinstall. You can then move Squealer to the Trash.")
         }
+    }
+
+    private func uninstall(erasingData: Bool) async {
+        if erasingData {
+            guard await model.eraseAllData() else { return }
+            let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            try? FileManager.default.removeItem(at: support.appendingPathComponent("Squealer", isDirectory: true))
+            if let bundleID = Bundle.main.bundleIdentifier {
+                UserDefaults.standard.removePersistentDomain(forName: bundleID)
+            }
+        }
+        await extensionManager.deactivate()
+        CommandLineTool.uninstall()
+        try? await SMAppService.mainApp.unregister()
     }
 
     private var statusText: String {

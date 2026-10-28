@@ -159,16 +159,14 @@ struct MenuBarView: View {
                 .accessibilityLabel("Settings")
                 .help("Settings")
             Menu {
-                Button("About Squealer") {
-                    NSApp.orderFrontStandardAboutPanel()
-                    NSApp.activate()
-                }
+                Button("About Squealer") { AboutPanel.show() }
                 if Updater.shared.isAvailable {
                     Button("Check for Updates…") {
                         Updater.shared.checkForUpdates()
                         NSApp.activate()
                     }
                 }
+                Link("Report an Issue…", destination: Links.newIssue)
                 Divider()
                 Button("Quit Squealer") { NSApp.terminate(nil) }
                     .keyboardShortcut("q")

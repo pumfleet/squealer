@@ -10,16 +10,37 @@
 #
 # One-time setup for notarization:
 #   xcrun notarytool store-credentials squealer --apple-id <id> --team-id U6P67B4375
-# Sparkle: run generate_keys once, then set SQUEALER_APPCAST_URL and SQUEALER_SPARKLE_PUBLIC_KEY in project.yml.
+# Sparkle signs the appcast with the EdDSA key generate_keys stored in the login keychain. Its public half is
+# SQUEALER_SPARKLE_PUBLIC_KEY in project.yml; without the private key, installed copies can't be updated.
 #
-# Usage: scripts/release.sh <version> [build] [--skip-notarize]
+# --publish creates the GitHub release v<version> with the DMG and appcast.xml. The app's feed is the appcast of the
+# latest release, so publishing is what ships the update.
+#
+# Usage: scripts/release.sh <version> [build] [--skip-notarize] [--publish]
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-version=${1:?usage: scripts/release.sh <version> [build] [--skip-notarize]}
-build=${2:-$(date +%Y%m%d%H%M)}
+usage="usage: scripts/release.sh <version> [build] [--skip-notarize] [--publish]"
 notarize=true
-[[ " $* " == *" --skip-notarize "* ]] && notarize=false
+publish=false
+positional=()
+for argument in "$@"; do
+    case $argument in
+        --skip-notarize) notarize=false ;;
+        --publish) publish=true ;;
+        -*) echo "$usage" >&2; exit 1 ;;
+        *) positional+=("$argument") ;;
+    esac
+done
+version=${positional[1]:?$usage}
+build=${positional[2]:-$(date +%Y%m%d%H%M)}
+repository=pumfleet/squealer
+if $publish; then
+    $notarize || { echo "--publish requires notarization." >&2; exit 1; }
+    [[ -z "$(git status --porcelain)" ]] || { echo "Commit your changes before publishing." >&2; exit 1; }
+    git fetch --quiet origin main
+    git merge-base --is-ancestor HEAD origin/main || { echo "Push HEAD to origin/main before publishing." >&2; exit 1; }
+fi
 team=U6P67B4375
 identity="Developer ID Application: Fusial LLC ($team)"
 out=build/release/$version
@@ -30,7 +51,7 @@ xcodegen generate --quiet
 
 echo "Archiving…"
 xcodebuild -project Squealer.xcodeproj -scheme Squealer -configuration Release \
-    -archivePath "$out/Squealer.xcarchive" -allowProvisioningUpdates \
+    -archivePath "$out/Squealer.xcarchive" -derivedDataPath build/DerivedDataRelease -allowProvisioningUpdates \
     MARKETING_VERSION="$version" SQUEALER_BUILD="$build" archive > "$out/archive.log" 2>&1 \
     || { grep -E "error:" "$out/archive.log" >&2; exit 1; }
 
@@ -93,7 +114,19 @@ if $notarize; then
     xcrun stapler staple "$dmg"
 fi
 
-if $notarize && command -v generate_appcast > /dev/null; then
-    generate_appcast "$out" --download-url-prefix "${SQUEALER_DOWNLOAD_PREFIX:?set SQUEALER_DOWNLOAD_PREFIX to where the DMG will be hosted}"
+if $notarize; then
+    echo "Generating appcast…"
+    # Only the DMG goes in: generate_appcast would also pick up the notarization zip.
+    updates="$out/updates"
+    mkdir -p "$updates"
+    cp "$dmg" "$updates/"
+    build/DerivedDataRelease/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_appcast "$updates" \
+        --download-url-prefix "https://github.com/$repository/releases/download/v$version/"
+fi
+
+if $publish; then
+    echo "Publishing v$version…"
+    gh release create "v$version" "$dmg" "$updates/appcast.xml" --repo "$repository" \
+        --target "$(git rev-parse HEAD)" --title "Squealer $version" --generate-notes
 fi
 echo "Release ready: $dmg"

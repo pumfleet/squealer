@@ -26,6 +26,8 @@ public enum EngineRequest: Codable, Sendable {
     case exportConfiguration
     /// Removes "until logout" rules from every login session except this one.
     case endLogoutSessions(except: String)
+    /// Deletes everything the extension stores, just before it's uninstalled.
+    case eraseAllData
 }
 
 extension EngineRequest {

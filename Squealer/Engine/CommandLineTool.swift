@@ -15,14 +15,23 @@ enum CommandLineTool {
 
     /// Links the bundled tool into /usr/local/bin, asking for an administrator password.
     static func install() -> String {
-        let command = "mkdir -p /usr/local/bin && ln -sf '\(bundledPath)' '\(linkPath)'"
-        let script = "do shell script \"\(command)\" with administrator privileges"
-        var error: NSDictionary?
-        NSAppleScript(source: script)?.executeAndReturnError(&error)
-        if let error {
+        if let error = runAsAdministrator("mkdir -p /usr/local/bin && ln -sf '\(bundledPath)' '\(linkPath)'") {
             return (error[NSAppleScript.errorMessage] as? String) ?? String(localized: "The tool couldn't be installed.")
         }
         return String(localized: "Installed. Try `squealer status` in Terminal.")
+    }
+
+    /// Removes the link if it points into a copy of Squealer, asking for an administrator password.
+    static func uninstall() {
+        guard let destination = try? FileManager.default.destinationOfSymbolicLink(atPath: linkPath),
+              destination.hasSuffix("/Contents/Helpers/squealer") else { return }
+        _ = runAsAdministrator("rm -f '\(linkPath)'")
+    }
+
+    private static func runAsAdministrator(_ command: String) -> NSDictionary? {
+        var error: NSDictionary?
+        NSAppleScript(source: "do shell script \"\(command)\" with administrator privileges")?.executeAndReturnError(&error)
+        return error
     }
 }
 

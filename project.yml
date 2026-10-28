@@ -60,8 +60,8 @@ targets:
         ENABLE_PREVIEWS: YES
         COMBINE_HIDPI_IMAGES: YES
         # Set both to enable Sparkle updates; leave empty to ship without an updater.
-        SQUEALER_APPCAST_URL: ""
-        SQUEALER_SPARKLE_PUBLIC_KEY: ""
+        SQUEALER_APPCAST_URL: https://github.com/pumfleet/squealer/releases/latest/download/appcast.xml
+        SQUEALER_SPARKLE_PUBLIC_KEY: tHkvqVAE1frUMojaIWTmduHWuu5oX2mY2L+VYHYeg3A=
     dependencies:
       - package: SquealerKit
       - package: Sparkle

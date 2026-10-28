@@ -285,6 +285,12 @@ final class AppModel {
         }
     }
 
+    func eraseAllData() async -> Bool {
+        guard await authorize() else { return false }
+        guard case .ok? = await perform(.eraseAllData) else { return false }
+        return true
+    }
+
     // MARK: Rule groups
 
     func save(_ group: RuleGroup) {

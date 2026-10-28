@@ -454,6 +454,9 @@ final class Engine: Sendable {
                     broadcastRules()
                 }
 
+            case .eraseAllData:
+                try store?.erase()
+
             case .trafficHistory, .refreshBlocklist, .refreshRuleGroup, .connectionLog:
                 break
             }

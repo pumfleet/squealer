@@ -8502,36 +8502,36 @@
         }
       }
     },
-    "Filtering stops immediately. You can then move Squealer to the Trash.": {
+    "Filtering stops immediately. Kept rules come back if you reinstall. You can then move Squealer to the Trash.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Das Filtern wird sofort beendet. Anschließend kann Squealer in den Papierkorb bewegt werden."
+            "value": "Das Filtern wird sofort beendet. Behaltene Regeln sind nach einer Neuinstallation wieder da. Anschließend kann Squealer in den Papierkorb bewegt werden."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "El filtrado se detiene de inmediato. Después puedes trasladar Squealer a la Papelera."
+            "value": "El filtrado se detiene de inmediato. Si conservas las reglas, volverán al reinstalar. Después puedes trasladar Squealer a la Papelera."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le filtrage s’arrête immédiatement. Vous pouvez ensuite placer Squealer dans la Corbeille."
+            "value": "Le filtrage s’arrête immédiatement. Les règles conservées reviennent si vous réinstallez. Vous pouvez ensuite placer Squealer dans la Corbeille."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "フィルタリングはすぐに停止します。その後、Squealerをゴミ箱に入れることができます。"
+            "value": "フィルタリングはすぐに停止します。残したルールは再インストール時に復元されます。その後、Squealerをゴミ箱に入れることができます。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "过滤会立即停止。然后你可以将 Squealer 移到废纸篓。"
+            "value": "过滤会立即停止。保留的规则会在重新安装后恢复。然后你可以将 Squealer 移到废纸篓。"
           }
         }
       }
@@ -8668,6 +8668,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "永久"
+          }
+        }
+      }
+    },
+    "Free software under the GNU General Public License v3.\n[Source code and issues on GitHub](%@)\n\nIP geolocation by [DB-IP.com](https://db-ip.com), CC BY 4.0.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Freie Software unter der GNU General Public License v3.\n[Quellcode und Fehlermeldungen auf GitHub](%@)\n\nIP-Geolokalisierung von [DB-IP.com](https://db-ip.com), CC BY 4.0."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Software libre bajo la Licencia Pública General de GNU v3.\n[Código fuente e incidencias en GitHub](%@)\n\nGeolocalización IP de [DB-IP.com](https://db-ip.com), CC BY 4.0."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Logiciel libre sous licence publique générale GNU v3.\n[Code source et signalements sur GitHub](%@)\n\nGéolocalisation IP par [DB-IP.com](https://db-ip.com), CC BY 4.0."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GNU General Public License v3 のもとで提供されるフリーソフトウェアです。\n[ソースコードと問題の報告は GitHub へ](%@)\n\nIP 位置情報：[DB-IP.com](https://db-ip.com)、CC BY 4.0"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "依据 GNU 通用公共许可证第 3 版发布的自由软件。\n[GitHub 上的源代码与问题反馈](%@)\n\nIP 地理位置数据由 [DB-IP.com](https://db-ip.com) 提供，CC BY 4.0。"
           }
         }
       }
@@ -14118,6 +14152,40 @@
         }
       }
     },
+    "Report an Issue…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Problem melden …"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Informar de un problema…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signaler un problème…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "問題を報告…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "报告问题…"
+          }
+        }
+      }
+    },
     "Require Touch ID or password for changes": {
       "localizations": {
         "de": {
@@ -18028,70 +18096,36 @@
         }
       }
     },
-    "Uninstall": {
+    "Uninstall Squealer?": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deinstallieren"
+            "value": "Squealer deinstallieren?"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Desinstalar"
+            "value": "¿Desinstalar Squealer?"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Désinstaller"
+            "value": "Désinstaller Squealer ?"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "アンインストール"
+            "value": "Squealerをアンインストールしますか？"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "卸载"
-          }
-        }
-      }
-    },
-    "Uninstall Squealer's network extension?": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Netzwerkerweiterung von Squealer deinstallieren?"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "¿Desinstalar la extensión de red de Squealer?"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Désinstaller l’extension réseau de Squealer ?"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Squealerのネットワーク機能拡張をアンインストールしますか？"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要卸载 Squealer 的网络扩展吗？"
+            "value": "要卸载 Squealer 吗？"
           }
         }
       }
@@ -18126,6 +18160,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "卸载 Squealer…"
+          }
+        }
+      }
+    },
+    "Uninstall and Delete All Data": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deinstallieren und alle Daten löschen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desinstalar y eliminar todos los datos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désinstaller et supprimer toutes les données"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アンインストールしてすべてのデータを削除"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "卸载并删除所有数据"
+          }
+        }
+      }
+    },
+    "Uninstall and Keep Rules": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deinstallieren und Regeln behalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desinstalar y conservar las reglas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désinstaller et conserver les règles"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アンインストールしてルールを残す"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "卸载并保留规则"
           }
         }
       }
