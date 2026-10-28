@@ -87,17 +87,31 @@ entitlements Squealer/Squealer.entitlements com.fusial.squealer "$out/app.entitl
 cp "$(profile com.fusial.squealer.extension)" "$extension/Contents/embedded.provisionprofile"
 cp "$(profile com.fusial.squealer)" "$app/Contents/embedded.provisionprofile"
 
-find "$app/Contents/Frameworks" -depth \( -name "*.framework" -o -name "*.dylib" -o -name "*.xpc" -o -name "*.app" \) 2>/dev/null \
+# Bare executables too, like Sparkle's Autoupdate; ones inside nested bundles are signed with their bundle.
+frameworks="$app/Contents/Frameworks"
+find "$frameworks" -depth \( -name "*.framework" -o -name "*.dylib" -o -name "*.xpc" -o -name "*.app" \
+    -o \( -type f -perm +111 ! -path "$frameworks/*.app/*" ! -path "$frameworks/*.xpc/*" \) \) 2>/dev/null \
     | while read -r item; do codesign --force --options runtime --timestamp --preserve-metadata=entitlements --sign "$identity" "$item"; done
 codesign --force --options runtime --timestamp --sign "$identity" "$app/Contents/Helpers/squealer"
 codesign --force --options runtime --timestamp --sign "$identity" --entitlements "$out/extension.entitlements" "$extension"
 codesign --force --options runtime --timestamp --sign "$identity" --entitlements "$out/app.entitlements" "$app"
 codesign --verify --deep --strict "$app"
 
+# notarytool exits 0 even when Apple rejects the upload, so check the status and print Apple's reasons.
+submit() {
+    local output
+    output=$(xcrun notarytool submit "$1" --keychain-profile squealer --wait 2>&1) || { echo "$output" >&2; return 1; }
+    if ! grep -q "status: Accepted" <<< "$output"; then
+        echo "$output" >&2
+        xcrun notarytool log "$(grep -oE "id: [0-9a-f-]{36}" <<< "$output" | head -1 | cut -c5-)" --keychain-profile squealer >&2
+        return 1
+    fi
+}
+
 if $notarize; then
     echo "Notarizing…"
     ditto -c -k --keepParent "$app" "$out/Squealer.zip"
-    xcrun notarytool submit "$out/Squealer.zip" --keychain-profile squealer --wait
+    submit "$out/Squealer.zip"
     xcrun stapler staple "$app"
 fi
 
@@ -110,7 +124,7 @@ ln -s /Applications "$staging/Applications"
 hdiutil create -volname "Squealer $version" -srcfolder "$staging" -ov -format UDZO "$dmg" > /dev/null
 codesign --sign "$identity" --timestamp "$dmg"
 if $notarize; then
-    xcrun notarytool submit "$dmg" --keychain-profile squealer --wait
+    submit "$dmg"
     xcrun stapler staple "$dmg"
 fi
 
