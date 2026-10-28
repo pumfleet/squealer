@@ -5,7 +5,7 @@ import SwiftUI
 
 struct TrafficMapView: View {
     @Environment(AppModel.self) private var model
-    @State private var selection: MapPoint.ID?
+    @Bindable private var navigation = NavigationModel.shared
     @State private var window: Window = .day
     @State private var position: MapCameraPosition = .automatic
     @State private var home = HomeLocation()
@@ -40,7 +40,7 @@ struct TrafficMapView: View {
     var body: some View {
         let points = self.points
         let maximum = max(points.map(\.bytes).max() ?? 1, 1)
-        Map(position: $position, selection: $selection) {
+        Map(position: $position, selection: $navigation.mapSelection) {
             if let origin = home.coordinate {
                 Annotation("This Mac", coordinate: origin) {
                     Image(systemName: "laptopcomputer")
@@ -80,12 +80,10 @@ struct TrafficMapView: View {
             legend(points)
                 .padding(12)
         }
-        .inspector(isPresented: Binding(get: { selection != nil }, set: { if !$0 { selection = nil } })) {
-            if let point = points.first(where: { $0.id == selection }) {
-                LocationInspector(point: point)
-                    .inspectorColumnWidth(min: 280, ideal: 320)
-            }
+        .onChange(of: points.first { $0.id == navigation.mapSelection }, initial: true) { _, point in
+            navigation.inspector = .location(point)
         }
+        .onDisappear { navigation.mapSelection = nil }
         .navigationTitle("Map")
         .toolbar {
             Picker("Period", selection: $window) {
@@ -149,7 +147,7 @@ struct TrafficMapView: View {
     }
 }
 
-private struct LocationInspector: View {
+struct LocationInspector: View {
     var point: TrafficMapView.MapPoint
 
     var body: some View {

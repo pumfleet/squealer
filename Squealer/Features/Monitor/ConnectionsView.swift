@@ -8,7 +8,7 @@ struct ConnectionsView: View {
     @State private var search = ""
     @State private var selection: ConnectionRow.ID?
     @State private var sortOrder = [KeyPathComparator(\ConnectionRow.lastSeen, order: .reverse)]
-    @State private var showInspector = true
+    @Bindable private var navigation = NavigationModel.shared
     @State private var paused = false
     @State private var frozenRows: [ConnectionRow]?
     @AppStorage("monitor.showLocal") private var showLocal = false
@@ -38,21 +38,14 @@ struct ConnectionsView: View {
                 .onChange(of: paused) { _, isPaused in
                     frozenRows = isPaused ? sortedRows : nil
                 }
-                Toggle(isOn: $showInspector) {
+                Toggle(isOn: $navigation.showConnectionInspector) {
                     Label("Inspector", systemImage: "sidebar.trailing")
                 }
                 .help("Show or hide details")
             }
         }
-        .inspector(isPresented: $showInspector) {
-            Group {
-                if let row = selectedRow(in: rows) {
-                    ConnectionInspector(row: row)
-                } else {
-                    EmptyStateView(title: "No Selection", symbol: "cursorarrow.click", message: "Select an app or a server to see its details and history.")
-                }
-            }
-            .inspectorColumnWidth(min: 300, ideal: 340, max: 480)
+        .onChange(of: selectedRow(in: rows), initial: true) { _, row in
+            navigation.inspector = .connection(row)
         }
     }
 

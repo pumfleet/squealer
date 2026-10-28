@@ -21,6 +21,16 @@ final class NavigationModel {
     var ruleFilterProcess: ProcessKey?
     var ruleFilterGroup: UUID?
     var logFilterProcess: ProcessKey?
+    var showConnectionInspector = true
+    var mapSelection: TrafficMapView.MapPoint.ID?
+    var inspector: InspectorContent = .none
+}
+
+/// What the main window's inspector shows. Sections report it because they own the data.
+enum InspectorContent: Equatable {
+    case none
+    case connection(ConnectionRow?)
+    case location(TrafficMapView.MapPoint?)
 }
 
 struct MainWindow: View {
@@ -58,7 +68,13 @@ struct MainWindow: View {
                     .padding(10)
             }
         } detail: {
+            // One inspector for every section: on macOS 15, AppKit throws while updating the toolbar if a
+            // section switch tears down an inspector that belongs to the section's own view.
             detail
+                .inspector(isPresented: inspectorPresented) {
+                    inspector
+                        .inspectorColumnWidth(min: 280, ideal: 340, max: 480)
+                }
         }
         .frame(minWidth: 960, minHeight: 560)
         .overlay(alignment: .top) {
@@ -81,6 +97,31 @@ struct MainWindow: View {
         case .rules: RulesView()
         case .blocklists: BlocklistsView()
         case .profiles: ProfilesView()
+        }
+    }
+
+    private var inspectorPresented: Binding<Bool> {
+        Binding {
+            switch navigation.section {
+            case .connections, .active, .blocked: navigation.showConnectionInspector
+            case .map: navigation.mapSelection != nil
+            default: false
+            }
+        } set: { presented in
+            switch navigation.section {
+            case .connections, .active, .blocked: navigation.showConnectionInspector = presented
+            case .map: if !presented { navigation.mapSelection = nil }
+            default: break
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var inspector: some View {
+        switch navigation.inspector {
+        case .connection(let row?): ConnectionInspector(row: row)
+        case .location(let point?): LocationInspector(point: point)
+        default: EmptyStateView(title: "No Selection", symbol: "cursorarrow.click", message: "Select an app or a server to see its details and history.")
         }
     }
 
